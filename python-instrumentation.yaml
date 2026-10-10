@@ -1,0 +1,24 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: python-instrumentation
+spec:
+  exporter:
+    endpoint: http://otel-collector:4318
+  env:
+  propagators:
+    - tracecontext
+    - baggage
+  python:
+    env:
+      - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
+        value: 'true'
+      - name: OTEL_TRACES_SAMPLER
+        value: traceidratio
+      - name: OTEL_TRACES_EXPORTER
+        value: otlp # console,otlp
+      - name: OTEL_METRICS_EXPORTER
+        value: otlp #   console 
+      - name: OTEL_LOG_EXPORTER
+        value: console
+

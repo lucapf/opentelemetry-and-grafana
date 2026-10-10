@@ -1,0 +1,103 @@
+# Demo-grade values: single replicas, no persistence, no auth.
+# fullnameOverride gives stable service names regardless of release name.
+
+# ---------------------------------------------------------------- Prometheus
+prometheus:
+  fullnameOverride: prometheus          # -> svc/prometheus-server:80
+  alertmanager:
+    enabled: true 
+  prometheus-pushgateway:
+    enabled: true 
+  server:
+    persistentVolume:
+      enabled: false
+
+# ---------------------------------------------------------------- Loki
+loki:
+  fullnameOverride: loki                # -> svc/loki-gateway:80
+  deploymentMode: SingleBinary
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: filesystem
+    schemaConfig:
+      configs:
+        - from: "2024-01-01"
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+  singleBinary:
+    replicas: 1
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  backend:
+    replicas: 0
+  chunksCache:
+    enabled: false
+  resultsCache:
+    enabled: false
+  lokiCanary:
+    enabled: false
+  test:
+    enabled: false
+  minio:
+    enabled: false
+
+# ---------------------------------------------------------------- Tempo
+tempo:
+  fullnameOverride: tempo               # -> svc/tempo: 3200 query, 4317/4318 OTLP
+  tempo:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+# ---------------------------------------------------------------- Grafana
+grafana:
+  fullnameOverride: grafana             # -> svc/grafana:80
+  adminPassword: admin
+  persistence:
+    enabled: false
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_role: Admin                   # demo only
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          uid: prometheus
+          type: prometheus
+          url: http://prometheus-server
+          isDefault: true
+        - name: Loki
+          uid: loki
+          type: loki
+          url: http://loki-gateway
+          jsonData:
+            derivedFields:            # log line -> trace
+              - name: TraceID
+                matcherRegex: '"?trace_?[iI][dD]"?[:=]"?(\w+)'
+                url: '$${__value.raw}'
+                datasourceUid: tempo
+        - name: Tempo
+          uid: tempo
+          type: tempo
+          url: http://tempo:3200
+          jsonData:
+            tracesToLogsV2:           # trace -> logs
+              datasourceUid: loki
+              filterByTraceID: true
+            serviceMap:
+              datasourceUid: prometheus

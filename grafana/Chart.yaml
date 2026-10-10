@@ -1,0 +1,22 @@
+apiVersion: v2
+name: observability
+description: Minimal Grafana LGTP stack (Grafana, Loki, Tempo, Prometheus) for a local kind cluster
+type: application
+version: 0.1.0
+
+# Grafana, Loki and Tempo OSS charts now live in grafana-community/helm-charts
+# (grafana/helm-charts is deprecated for these). Run `helm dependency update`
+# and commit Chart.lock to pin the resolved versions.
+dependencies:
+  - name: grafana
+    version: "*"
+    repository: https://grafana-community.github.io/helm-charts
+  - name: loki
+    version: "*"
+    repository: https://grafana-community.github.io/helm-charts
+  - name: tempo
+    version: "*"
+    repository: https://grafana-community.github.io/helm-charts
+  - name: prometheus
+    version: "*"
+    repository: https://prometheus-community.github.io/helm-charts

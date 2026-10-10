@@ -1,0 +1,36 @@
+# DaemonSet configuration example
+# https://github.com/open-telemetry/opentelemetry-operator/blob/main/tests/e2e/smoke-collector/smoke-collector-daemonset/00-install.yaml
+# Install:
+# kubectl -n observability apply -f otel-collector-deployment.yaml
+#
+#   kubectl logs -n observability otel-coll-deployment -f
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel
+spec:
+  mode: daemonset
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+            receivers:
+    exporters:
+      debug:
+        verbosity: normal # basic, normal, detailed
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [debug]
+        metrics:
+          receivers: [otlp]
+          exporters: [debug]
+        logs:
+          receivers: [otlp]
+          exporters: [debug]
