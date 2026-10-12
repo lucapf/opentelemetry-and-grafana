@@ -20,5 +20,5 @@ spec:
       - name: OTEL_METRICS_EXPORTER
         value: otlp #   console 
       - name: OTEL_LOG_EXPORTER
-        value: console
+        value: otlp
 

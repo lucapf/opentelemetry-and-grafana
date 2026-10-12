@@ -1,5 +1,5 @@
 #!/bin/bash
-IMAGE="hello-world:0.0.1 "
+IMAGE="hello-world:0.0.2"
 
 echo -n "loading image to kind.."
 docker build -t $IMAGE .
@@ -20,11 +20,20 @@ else
   echo ".. SUCCESS!"
 fi
 
+echo -n "deploy postgres.."
+kubectl apply -f postgresql.yaml
+if [ $? -ne 0 ]; then
+  echo ".. FAILED cannot deploy postgres, pls check the logs"
+  exit -3
+else
+  echo ".. SUCCESS!"
+fi
+
 echo -n "deploy image.."
 kubectl apply -f hello-wold-deployment.yaml
 if [ $? -ne 0 ]; then
   echo ".. FAILED cannot deploy the hello-world image, pls check the logs"
-  exit -3
+  exit -4
 else
   echo ".. SUCCESS!"
 fi

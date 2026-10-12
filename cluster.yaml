@@ -8,6 +8,23 @@ nodes:
     nodeRegistration:
       kubeletExtraArgs:
         system-reserved: memory=2Gi
+  # NodePorts 3080-3083 are below the default range (30000-32767): widen it
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        - name: service-node-port-range
+          value: "3000-32767"
+  # host port -> node port (services are defined in services.yaml)
+  extraPortMappings:
+  - containerPort: 3080   # Grafana
+    hostPort: 8000
+  - containerPort: 3081   # Loki
+    hostPort: 8001
+  - containerPort: 3082   # Prometheus
+    hostPort: 8002
+  - containerPort: 3083   # hello world
+    hostPort: 8003
 - role: worker
   kubeadmConfigPatches:
   - |
@@ -15,4 +32,3 @@ nodes:
     nodeRegistration:
       kubeletExtraArgs:
         system-reserved: memory=6Gi
-

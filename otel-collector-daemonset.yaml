@@ -1,15 +1,20 @@
-# DaemonSet configuration example
-# https://github.com/open-telemetry/opentelemetry-operator/blob/main/tests/e2e/smoke-collector/smoke-collector-daemonset/00-install.yaml
-# Install:
-# kubectl -n observability apply -f otel-collector-deployment.yaml
-#
-#   kubectl logs -n observability otel-coll-deployment -f
 apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel
 spec:
   mode: daemonset
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.160.0
+  env:
+    - name: POSTGRES_USER
+      valueFrom:
+        secretKeyRef: {name: postgres, key: POSTGRES_USER}
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef: {name: postgres, key: POSTGRES_PASSWORD}
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8889"
   config:
     receivers:
       otlp:
@@ -18,19 +23,37 @@ spec:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
-            receivers:
+      postgresql:
+        endpoint: postgres.observability-demo.svc.cluster.local:5432
+        transport: tcp
+        username: ${env:POSTGRES_USER}
+        password: ${env:POSTGRES_PASSWORD}
+        databases: [urlstore]
+        collection_interval: 30s
+        tls:
+          insecure: true
     exporters:
       debug:
         verbosity: normal # basic, normal, detailed
+      prometheus:
+        endpoint: 0.0.0.0:8889
+        resource_to_telemetry_conversion:
+          enabled: true
+      otlp/tempo:
+        endpoint: tempo.grafana.svc.cluster.local:4317
+        tls:
+          insecure: true
+      otlphttp/loki:
+        endpoint: http://loki-gateway.grafana.svc.cluster.local/otlp
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
-          exporters: [debug]
+          exporters: [debug, otlp/tempo]
         metrics:
-          receivers: [otlp]
-          exporters: [debug]
+          receivers: [otlp, postgresql]
+          exporters: [debug, prometheus]
         logs:
           receivers: [otlp]
-          exporters: [debug]
+          exporters: [debug, otlphttp/loki]

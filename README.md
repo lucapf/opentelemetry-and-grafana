@@ -23,3 +23,10 @@ The [installation guide](docs/observability_installation_procedure.md) guide to 
 - verify the metrics, traces and logs are available on either the OtelCollector logs (using the standard debug exporter) and the 
 
 The architecture is explained in the [observability architecture](./docs/observability.md) document.
+
+## Port Mapping
+The current `cluster.yaml` preconfigure the mapping according to the diagram.
+
+![kind port mapping](./docs/images/observability-kind-deployment.drawio.png)
+
+

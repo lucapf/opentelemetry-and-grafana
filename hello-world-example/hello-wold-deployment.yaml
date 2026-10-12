@@ -16,22 +16,24 @@ spec:
         instrumentation.opentelemetry.io/inject-python: "true"
       labels:
         app: hello-world-example
-
     spec:
       containers:
-      - image: hello-world:0.0.1
+      - image: hello-world:0.0.2
         name: hello-world
         env:
         - name: OTEL_SERVICE_NAME
           value: hello-world
-        # - name: OTEL_TRACES_EXPORTER
-        #  value: console,otlp # console,otlp
-        # - name: OTEL_METRICS_EXPORTER
-        #  value: console,otlp #   console 
-        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        #   value: http://localhost:4318
-        # - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-        #   value: 0.0.0.0:4317
-
+        # libpq connection settings, read by psycopg.connect() (see postgresql.yaml)
+        - name: PGHOST
+          value: postgres
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef: {name: postgres, key: POSTGRES_USER}
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef: {name: postgres, key: POSTGRES_PASSWORD}
+        - name: PGDATABASE
+          valueFrom:
+            secretKeyRef: {name: postgres, key: POSTGRES_DB}
         resources: {}
 status: {}

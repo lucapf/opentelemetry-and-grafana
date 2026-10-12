@@ -3,7 +3,7 @@
 
 # ---------------------------------------------------------------- Prometheus
 prometheus:
-  fullnameOverride: prometheus          # -> svc/prometheus-server:80
+  fullnameOverride: prometheus          # not applied to the server: svc is grafana-prometheus-server:80
   alertmanager:
     enabled: true 
   prometheus-pushgateway:
@@ -79,7 +79,7 @@ grafana:
         - name: Prometheus
           uid: prometheus
           type: prometheus
-          url: http://prometheus-server
+          url: http://grafana-prometheus-server
           isDefault: true
         - name: Loki
           uid: loki
