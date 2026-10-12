@@ -1,7 +1,7 @@
 #!/bin/bash
 IMAGE="hello-world:0.0.2"
 
-echo -n "loading image to kind.."
+echo -n "building the app.."
 docker build -t $IMAGE .
 
 if [ $? -ne 0 ]; then
@@ -16,15 +16,6 @@ kind load docker-image $IMAGE
 if [ $? -ne 0 ]; then
   echo ".. FAILED cannot load the image, pls check the logs"
   exit -2
-else
-  echo ".. SUCCESS!"
-fi
-
-echo -n "deploy postgres.."
-kubectl apply -f postgresql.yaml
-if [ $? -ne 0 ]; then
-  echo ".. FAILED cannot deploy postgres, pls check the logs"
-  exit -3
 else
   echo ".. SUCCESS!"
 fi

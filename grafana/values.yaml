@@ -86,9 +86,10 @@ grafana:
           type: loki
           url: http://loki-gateway
           jsonData:
-            derivedFields:            # log line -> trace
+            derivedFields:            # log -> trace, from the trace_id structured metadata
               - name: TraceID
-                matcherRegex: '"?trace_?[iI][dD]"?[:=]"?(\w+)'
+                matcherType: label
+                matcherRegex: trace_id
                 url: '$${__value.raw}'
                 datasourceUid: tempo
         - name: Tempo
@@ -96,8 +97,11 @@ grafana:
           type: tempo
           url: http://tempo:3200
           jsonData:
-            tracesToLogsV2:           # trace -> logs
+            tracesToLogsV2:           # trace -> logs: trace_id is structured metadata, not part of the log line
               datasourceUid: loki
-              filterByTraceID: true
+              spanStartTimeShift: '-5m'
+              spanEndTimeShift: '5m'
+              customQuery: true
+              query: '{service_name=~".+"} | trace_id="$${__trace.traceId}"'
             serviceMap:
               datasourceUid: prometheus

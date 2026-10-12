@@ -1,7 +1,8 @@
+requests
+psycopg[binary]
 fastapi[standard]
 opentelemetry-distro 
 opentelemetry-exporter-otlp
 opentelemetry-instrumentation-fastapi
 opentelemetry-instrumentation-logging
-requests
-psycopg[binary]
+opentelemetry-instrumentation-psycopg
