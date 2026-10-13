@@ -68,7 +68,6 @@ Using this approach we are able to use the same instance to collect metrics comi
 
 ```
 kubectl apply -f otel-collector-daemonset.yaml
-
 ```
 
 Verify that everything works as expected `kubectl get pods`
@@ -93,9 +92,8 @@ kubectl apply -f python-instrumentation.yaml
 - install the chart
   ```
   helm install -n grafana  --create-namespace --dependency-update --values values.yaml  grafana
-- install the `service.yaml` with the `NodePort` binding
   ```
-
+  
 ## Install the database
 
 Deploy the database via:
