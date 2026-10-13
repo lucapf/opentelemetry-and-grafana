@@ -90,7 +90,7 @@ kubectl apply -f python-instrumentation.yaml
 - Go to the `grafana` folder
 - install the chart
   ```
-  helm install -n grafana  --create-namespace --dependency-update --values values.yaml  grafana
+  helm install -n grafana  --create-namespace --dependency-update --values values.yaml  grafana .
   ```
   
 ## Install the database
@@ -107,49 +107,6 @@ The script also initialize the hello-world database.
 
 The hello world application is a small **URL store** built with FastAPI and PostgreSQL.
 
-### Application files:
-- `main.py` :  http endpoint
-- `license.py`: license check
-- `storage.py`: storage (PostgreSQL) access
-
-### API
-
-- `POST /urls` receives `{"url": "..."}`, validates it, stores it in PostgreSQL and replies
-  `200 {"message": "your request has been stored!", "id": N}`.
-
-### License
-
- Te application can only store 10 new URLS because the licensing model. 
-If no more licenses are available the system respond with 
-  `403 license expired`.
-The counter is reset after each reboot
-
-### Logging
-
-The logging convention (fixed event message, details in `extra={...}`).
-See the [logging doc](./logging.md) for further detail.
-
-### Other errors 
-An unreachable database gets `503`.
-
-### OpenTelemetry integration
-
-The application code does not contain any telemetry setup: the OpenTelemetry operator injects the Python agent, which traces the FastAPI requests, propagate to the database calls and exports the logs.
-
-By default the operator doesn't trace internal function calls. 
-Usually business steps are traced. Is still possible to add custom traces via annotation as shown in `validate_license`.
-
-
-#### How the application is instrumented
-
-The startup script runs the generic instrumentation (opentelemetry-instrument) command:
-
-```
-CMD ["/bin/bash", "-c", "opentelemetry-instrument fastapi run /hello-world/app/main.py"]
-```
-
-While the new Kubernetes kind `Instrumentation` manages the instrumentation configuration.
-
 ## build and deploy the hello-world-example application and its database
 
 - Go into the `hello-world-example` directory
@@ -164,13 +121,6 @@ While the new Kubernetes kind `Instrumentation` manages the instrumentation conf
   ```
   kubectl apply -f services.yaml
   ```
-
-## Access URL
-
-- Grafana dashboard: `http://localhost:8000/` (access via **admin/admin**)
-- Hello World application: `http://localhost:8003/docs`
-- Prometheus metrics: `http://localhost:8002/metrics`
-- Loki logs: `http://localhost:8001/loki/api/v1/tail`
 
 ### The hello wolrd api
 
@@ -190,3 +140,12 @@ The table below show the static port configuration.
 | Prometheus  | 80            | 3082     | 8002          |
 | Loki        | 80            | 3081     | 8001          |
 | Grafana     | 80            | 3080     | 8000          |
+
+## Access URL
+
+- Grafana dashboard: `http://localhost:8000/` (access via **admin/admin**)
+- Hello World application: `http://localhost:8003/docs`
+- Prometheus metrics: `http://localhost:8002/metrics`
+- Loki logs: `http://localhost:8001/loki/api/v1/tail`
+
+

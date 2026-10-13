@@ -11,10 +11,15 @@ For example in the simple workflow of our application, the app logs the followin
 *A well-formatted log line has a **fixed message** (the event name) and its details as **separate fields***:
 
 ```python
-logger.info("url stored", extra={"url.id": url_id, "url.domain": domain, "license.remaining": 7})
+logger.info("url stored", 
+            extra={"url.id": url_id, 
+                   "url.domain": domain, 
+                   "license.remaining": 7}
+            )
 ```
 
 The details are kept out of the message on purpose:
+
 - A fixed message can be counted and grouped. With `f"stored {url}"`, every line would be different.
 - Each `extra` key becomes a field you can filter on (`url.domain` becomes `url_domain` in Loki).
 - `trace_id`, timestamp, service and pod are **not** added by the code: the agent attaches them automatically.
