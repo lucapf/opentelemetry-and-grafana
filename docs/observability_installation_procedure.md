@@ -18,7 +18,6 @@ Using the command
 
 ```
 kind create cluster --config cluster.yaml
-
 ```
 the content of the `cluster.yaml` is in the same directory as the example.
 
@@ -158,15 +157,6 @@ While the new Kubernetes kind `Instrumentation` manages the instrumentation conf
   - builds the image and loads it into the kind cluster
   - deploys the application (`hello-wold-deployment.yaml`)
 
-### try it
-
-```sh
-curl -X POST "localhost:8003/urls?url=opentelemetry.io/docs"
-# {"message":"your request has been stored!","id":1}
-# after 10 requests:
-# {"detail":"license expired"}   (HTTP 403)
-```
-
 ## Enable the access
 
 - move back to the project root directory
@@ -182,8 +172,17 @@ curl -X POST "localhost:8003/urls?url=opentelemetry.io/docs"
 - Prometheus metrics: `http://localhost:8002/metrics`
 - Loki logs: `http://localhost:8001/loki/api/v1/tail`
 
+### The hello wolrd api
+
+```sh
+curl -X POST "localhost:8003/urls?url=opentelemetry.io/docs"
+# {"message":"your request has been stored!","id":1}
+# after 10 requests:
+# {"detail":"license expired"}   (HTTP 403)
+```
+
 ## Access mapping port
-The table below show the static configuration.
+The table below show the static port configuration.
 
 | application | internal port | nodePort | external port |
 |-------------|---------------|----------|---------------|
