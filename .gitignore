@@ -2,3 +2,5 @@ attic
 **/.venv
 \.$*
 *.lock
+**/__pycache__
+*.tgz

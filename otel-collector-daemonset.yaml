@@ -29,9 +29,23 @@ spec:
         username: ${env:POSTGRES_USER}
         password: ${env:POSTGRES_PASSWORD}
         databases: [urlstore]
-        collection_interval: 30s
+        collection_interval: 15s          # how often PostgreSQL is read
         tls:
           insecure: true
+    processors:
+      # Refers to https://opentelemetry.io/docs/specs/otel/logs/data-model/
+      transform/logs:
+        error_mode: ignore
+        log_statements:
+          # Attributes
+          - delete_matching_keys(log.attributes, "^code\\.")
+          - delete_matching_keys(resource.attributes, "^telemetry\\.")
+          - delete_key(resource.attributes, "service.instance.id")
+          - delete_key(resource.attributes, "k8s.replicaset.name")
+          - delete_key(resource.attributes, "k8s.node.name")
+          # Fields
+          - set(log.severity_number, SEVERITY_NUMBER_UNSPECIFIED)
+          - set(scope.name, "")
     exporters:
       debug:
         verbosity: normal # basic, normal, detailed
@@ -56,4 +70,5 @@ spec:
           exporters: [debug, prometheus]
         logs:
           receivers: [otlp]
+          processors: [transform/logs]
           exporters: [debug, otlphttp/loki]

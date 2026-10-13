@@ -19,7 +19,7 @@ class LicenseExpired(Exception):
 def validate_license() -> int:
     global remaining
     if remaining == 0:
-        logger.warning("license expired")
+        logger.warning("license expired", extra={"license.remaining": 0})
         raise LicenseExpired()
     remaining -= 1
     return remaining

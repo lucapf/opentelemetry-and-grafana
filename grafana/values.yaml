@@ -11,6 +11,8 @@ prometheus:
   server:
     persistentVolume:
       enabled: false
+    global:
+      scrape_interval: 15s              # how often every target is scraped (chart default 1m)
 
 # ---------------------------------------------------------------- Loki
 loki:
@@ -72,6 +74,12 @@ grafana:
     auth.anonymous:
       enabled: true
       org_role: Admin                   # demo only
+  # Dashboards: the ConfigMaps from templates/dashboards.yaml (one per dashboards/*.json).
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -81,6 +89,8 @@ grafana:
           type: prometheus
           url: http://grafana-prometheus-server
           isDefault: true
+          jsonData:
+            timeInterval: 15s         # = prometheus.server.global.scrape_interval: $__rate_interval is then wide enough for rate()
         - name: Loki
           uid: loki
           type: loki

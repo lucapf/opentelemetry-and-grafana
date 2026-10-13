@@ -9,16 +9,20 @@ spec:
   propagators:
     - tracecontext
     - baggage
+  # Which traces are kept: a ratio of them (1 = all), the operator sets OTEL_TRACES_SAMPLER and
+  # OTEL_TRACES_SAMPLER_ARG from it.
+  sampler:
+    type: traceidratio
+    argument: "1"
   python:
     env:
-      - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
-        value: 'true'
-      - name: OTEL_TRACES_SAMPLER
-        value: traceidratio
       - name: OTEL_TRACES_EXPORTER
         value: otlp # console,otlp
       - name: OTEL_METRICS_EXPORTER
         value: otlp #   console 
-      - name: OTEL_LOG_EXPORTER
+      # How often the app sends its metrics to the collector, in ms (SDK default 60000).
+      - name: OTEL_METRIC_EXPORT_INTERVAL
+        value: "15000"
+      - name: OTEL_LOGS_EXPORTER
         value: otlp
 
