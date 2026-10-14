@@ -31,11 +31,7 @@ fi
 
 echo "
 *****
-hello world configuration completed. To access the pod pls use the port forwarding command:
-
-kubectl port-forward <pod-id> 8000:8000
-
-then access to the api at the address http://localhost:8000/docs
+hello world configuration completed. 
 
 To delete the instance:
 
